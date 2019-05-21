@@ -1,7 +1,8 @@
 const express = require("express");
 var spawn = require("child_process").spawn;
 let app = express();
-let server = require("http").createServer(app);
+// let server = require("http").createServer(app);
+let server =app.listen(process.env.PORT||800 , console.log("server running"))
 let fs = require("fs");
 let bodyparser = require("body-parser");
 const io = require("socket.io")(server);
@@ -132,4 +133,4 @@ app.get("/",(req,res)=>{
 
 
 
-server.listen( process.env.PORT||800 , console.log("server running"))
+// server.listen( process.env.PORT||800 , console.log("server running"))
