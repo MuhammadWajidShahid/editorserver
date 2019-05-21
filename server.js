@@ -68,6 +68,7 @@ io.on("connection", socket => {
                 f = true;
                 if (stderr) {
                     console.log(stderr)
+                    socket.emit("err", stderr);
                 }
                 else {
                     console.log(f);
