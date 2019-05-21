@@ -132,4 +132,4 @@ app.get("/",(req,res)=>{
 
 
 
-server.listen(800 || process.env.PORT, console.log("server running"))
+server.listen( process.env.PORT||800 , console.log("server running"))
