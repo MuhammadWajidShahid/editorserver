@@ -23,4 +23,5 @@ flex
 bison
 libisl15
 libisl-dev
+mingw-w64
 make
