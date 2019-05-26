@@ -59,7 +59,7 @@ io.on("connection", socket => {
             proc.stderr.on('data', function (_stderr) {
                 stderr += _stderr;
             });
-            proc.stderr.on('end', function () {
+            proc.stderr.on('end', function (){
                 proc.kill();
                 f = true;
             });
