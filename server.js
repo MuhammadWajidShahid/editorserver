@@ -2,12 +2,12 @@ const express = require("express");
 var spawn = require("child_process").spawn;
 let app = express();
 // let server = require("http").createServer(app);
-let server =app.listen(process.env.PORT||800 , console.log("server running"))
+let server = app.listen(process.env.PORT || 800, console.log("server running"))
 let fs = require("fs");
 let bodyparser = require("body-parser");
 const io = require("socket.io")(server);
 const pty = require("node-pty");
-const rmdir= require('rimraf');
+const rmdir = require('rimraf');
 var os = require('os');
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json())
@@ -19,10 +19,29 @@ io.on("connection", socket => {
     console.log("connected" + socket.id);
     let shell;
     let exit = true;
+    let proc;
+    let stop=false;
     // For all websocket data send it to the shell
     socket.on('message', (msg) => {
         shell.write(msg);
         // console.log(msg)
+    });
+    socket.on('stopcomp', (msg) => {
+        if(msg)
+        {
+            if(proc)
+            proc.kill();
+            if(!exit)
+            shell.kill();
+            stop=true;
+            socket.emit("exit", true);
+        }
+    });
+    socket.on('stoprun', (msg) => {
+        if(msg&&shell)
+        {
+            shell.kill();
+        }
     });
     socket.on("runcpp", (data) => {
         console.log(data)
@@ -45,9 +64,10 @@ io.on("connection", socket => {
         });
         console.log(done)
         if (done) {
+            stop=false;
             if (!exit)
                 shell.kill();
-            var proc = spawn('gcc', [`./programs/${socket.id}` + '/' + `program` + ".cpp", "-o", `./programs/${socket.id}` + '/' + `program`, '-lstdc++']);
+             proc = spawn('gcc', [`./programs/${socket.id}` + '/' + `program` + ".cpp", "-o", `./programs/${socket.id}` + '/' + `program`, '-lstdc++']);
             var stdout = "";
             var stderr = "";
             var f = false;
@@ -59,7 +79,7 @@ io.on("connection", socket => {
             proc.stderr.on('data', function (_stderr) {
                 stderr += _stderr;
             });
-            proc.stderr.on('end', function (){
+            proc.stderr.on('end', function () {
                 proc.kill();
                 f = true;
             });
@@ -68,10 +88,18 @@ io.on("connection", socket => {
                 f = true;
                 if (stderr) {
                     console.log(stderr)
+                    var find = `./programs/${socket.id}` + '/' + `program` + ".cpp";
+                    var re = new RegExp(find, 'g');
+                    stderr=stderr.replace(re,'');
                     socket.emit("err", stderr);
                 }
                 else {
+                    if(stdout)
+                    socket.emit("err", stdout);
+                    else{
+                    if(!stop){
                     console.log(f);
+                    socket.emit("err", "Compilation Succeded");
                     if (f) {
                         var name = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
                         shell = pty.spawn(name
@@ -82,12 +110,12 @@ io.on("connection", socket => {
                                 env: process.env,
                                 shell: true
                             });
-                            exit = false;
+                        exit = false;
                         socket.emit("running", true);
                         // For all shell data send it to the websocket
                         shell.on('data', (data) => {
-                            if(!exit)
-                            socket.emit("responce", data);
+                            if (!exit)
+                                socket.emit("responce", data);
                             // console.log(data)
                         });
                         // // For all websocket data send it to the shell
@@ -98,10 +126,12 @@ io.on("connection", socket => {
                         shell.on("exit", d => {
                             exit = true;
                             console.log("exited");
-                            socket.emit("responce", '\n');
+                            // socket.emit("responce", '\n');
                             socket.emit("exit", true);
                         });
                     }
+                }
+            }
                 }
 
             });
@@ -113,19 +143,19 @@ io.on("connection", socket => {
 
     });
 
-    socket.on("disconnect",  function () {
+    socket.on("disconnect", function () {
         if (!exit)
-         shell.kill();
+            shell.kill();
 
-        rmdir(`./programs/${socket.id}`,(err)=>{
-            if(err)
-            console.log(err)
+        rmdir(`./programs/${socket.id}`, (err) => {
+            if (err)
+                console.log(err)
         })
         console.log("disconnect" + socket.id);
     })
 });
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
     res.send("jlo");
 })
 
