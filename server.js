@@ -9,6 +9,13 @@ const io = require("socket.io")(server);
 const pty = require("node-pty");
 const rmdir = require('rimraf');
 var os = require('os');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+require("./config/db-config.js");
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var session = require("express-session")
+app.use(session({ secret: "secret-word" }));
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json())
 app.use(express.static("./build"));
@@ -158,10 +165,100 @@ io.on("connection", socket => {
 app.get("/", (req, res) => {
     res.send("jlo");
 })
+let users=require("./models/user-model");
+app.post("/adduser",(req,res)=>{
+    users.findOne({email:req.body.email},(err,user)=>{
+if(!err){
+    if(!user){
+    bcrypt.hash(req.body.pass, saltRounds, function(err, hash) {
+        // Store hash in your password DB.
+        if(!err){
+    let user=new users({
+        firstname:req.body.fname,
+        lastname:req.body.lname,
+        email:req.body.email,
+        password:hash,
+    });
+    user.save((err,user)=>{
+        if(err)
+        console.log(err)
+        else
+        res.json({success:true});
+    });
+}
+});
+    }
+else{
+    res.json({success:false});
+}
+}
 
+});
+})
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(
+    {usernameField:"email", passwordField:"password"},
+    function (email, password, next) {
 
+        // var user;
+         users.findOne({email:email},(err,user)=>{
+            // if(!err)
+            // user=nuser;
+            if (user) {
+                bcrypt.compare(password, user.password, function(err, res) {
+                    // res == true
+                    if(!err&&res)
+                    next(null, user);
+                    else {
+                        next(null, false);
+                    }
+                });
+            } 
+        });
+    }));
 
+    passport.serializeUser(function (user, next) {
+        next(null, user._id);
+    });
+    
+    passport.deserializeUser(function (id, next) {
+        // var user = users.find((user) => {
+        //     return user._id === id;
+        // });
+        users.findOne({_id:id},(err,user)=>{
+            if(!err&&user)
+            next(null, user);
+        })
+    
+    });
 
+    app.post('/login',
+    // passport.authenticate('local'), 
+    function (req, res,next) {
+        // res.send("success");
+        passport.authenticate('local', function(err, user, info) {
+            if (err) { return next(err); }
+            if (!user) { return res.json({success:false}); }
+            req.logIn(user, function(err) {
+              if (err) { return next(err); }
+              res.json({success:true,user:user});
+            //   return res.redirect('/users/' + user.username);
+            });
+          })(req, res, next);
+    });
+    app.get('/mainpage',(req,res)=>{
+        if(req.isAuthenticated())
+        res.json({success:true,user:req.user});
+        else
+        res.json({success:false,});
+    });
+    app.get('/logout', function(req, res){
+        req.logout();
+        res.json({success:true});
+      });
+      var programsRoute=require("./routes/programs-routes")
+app.use("/user/programs",programsRoute)
 
 // server.listen( process.env.PORT||800 , console.log("server running"))

@@ -11,10 +11,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "express": "^4.17.0",
+    "express-session": "^1.16.1",
     "http": "0.0.0",
+    "mongoose": "^5.5.11",
     "node-pty": "^0.8.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
     "rimraf": "^2.6.3",
     "socket.io": "^2.2.0",
     "xterm": "^3.13.1"
