@@ -74,7 +74,7 @@ io.on("connection", socket => {
             stop=false;
             if (!exit)
                 shell.kill();
-             proc = spawn('gcc', [`./programs/${socket.id}` + '/' + `program` + ".cpp", "-o", `./programs/${socket.id}` + '/' + `program`, '-lstdc++']);
+             proc = spawn('g++', [`./programs/${socket.id}` + '/' + `program` + ".cpp", "-o", `./programs/${socket.id}` + '/' + `program`]);
             var stdout = "";
             var stderr = "";
             var f = false;
