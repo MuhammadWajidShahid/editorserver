@@ -110,7 +110,7 @@ io.on("connection", socket => {
                     if (f) {
                         var name = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
                         shell = pty.spawn(name
-                            , ["./program.exe"]
+                            , ["./program"]
                             , {
                                 name: 'xterm-color',
                                 cwd: `${__dirname}/programs/${socket.id}`,
