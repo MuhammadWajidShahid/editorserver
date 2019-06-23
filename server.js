@@ -15,7 +15,7 @@ require("./config/db-config.js");
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var session = require("express-session")
-app.use(session({ secret: "secret-word" }));
+app.use(session({ secret: "//+)*7fdre!23dfsdf@#323#@$dsf" }));
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json())
 app.use(express.static("./build"));
