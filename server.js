@@ -6,7 +6,7 @@ let server = app.listen(process.env.PORT || 800, console.log("server running"))
 let fs = require("fs");
 let bodyparser = require("body-parser");
 const io = require("socket.io")(server);
-const pty = require("pty.js");
+const pty = require("node-pty");
 const rmdir = require('rimraf');
 var os = require('os');
 const bcrypt = require('bcrypt');
@@ -109,7 +109,7 @@ io.on("connection", socket => {
                     socket.emit("err", "Compilation Succeded");
                     if (f) {
                         var name = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-                        shell = pty.spawn(name, ["./program"], {
+                        shell = pty.spawn(name, ["file","program"], {
                             name: 'xterm-color',
                             cols: 80,
                             rows: 30,
