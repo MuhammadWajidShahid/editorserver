@@ -109,12 +109,12 @@ io.on("connection", socket => {
                     socket.emit("err", "Compilation Succeded");
                     if (f) {
                         var name = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-                        shell = pty.spawn(name, ["ls"], {
+                        shell = pty.spawn('bash', ["g++","jo.cpp","-o","jo"], {
                             name: 'xterm-color',
                             cols: 80,
                             rows: 30,
-                            cwd: `${__dirname}/programs/${socket.id}`,
-                            // cwd: process.env.HOME,
+                            // cwd: `${__dirname}/programs/${socket.id}`,
+                            cwd: process.env.HOME,
                             env: process.env
                           });
                         // shell = pty.spawn(name
