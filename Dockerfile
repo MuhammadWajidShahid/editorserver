@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get -y install gcc mono-mcs && \
     rm -rf /var/lib/apt/lists/*
- RUN  aptitude install wine
+#  RUN  aptitude install wine
 # RUN apt-get update && \
     # apt-get install aptitude && \
 FROM node:10.13.0
