@@ -113,7 +113,7 @@ io.on("connection", socket => {
                             // , ["./program"]
                             , {
                                 name: 'xterm-color',
-                                cwd: `${__dirname}/programs/${socket.id}`,
+                                // cwd: `${__dirname}/programs/${socket.id}`,
                                 env: process.env,
                                 shell: true
                             });
