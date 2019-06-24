@@ -109,7 +109,7 @@ io.on("connection", socket => {
                     socket.emit("err", "Compilation Succeded");
                     if (f) {
                         var name = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-                        shell = pty.spawn(name, ["file","program"], {
+                        shell = pty.spawn(name, ["ls"], {
                             name: 'xterm-color',
                             cols: 80,
                             rows: 30,
