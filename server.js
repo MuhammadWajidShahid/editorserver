@@ -109,14 +109,21 @@ io.on("connection", socket => {
                     socket.emit("err", "Compilation Succeded");
                     if (f) {
                         var name = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-                        shell = pty.spawn(name
-                            // , ["./program"]
-                            , {
-                                name: 'xterm-color',
-                                // cwd: `${__dirname}/programs/${socket.id}`,
-                                env: process.env,
-                                shell: true
-                            });
+                        shell = pty.spawn(name, [], {
+                            name: 'xterm-color',
+                            cols: 80,
+                            rows: 30,
+                            cwd: process.env.HOME,
+                            env: process.env
+                          });
+                        // shell = pty.spawn(name
+                        //     // , ["./program"]
+                        //     , {
+                        //         name: 'xterm-color',
+                        //         // cwd: `${__dirname}/programs/${socket.id}`,
+                        //         env: process.env,
+                        //         shell: true
+                        //     });
                         exit = false;
                         socket.emit("running", true);
                         // For all shell data send it to the websocket
