@@ -4,7 +4,8 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get -y install gcc mono-mcs && \
     rm -rf /var/lib/apt/lists/*
-RUN apt-get install --install-recommends winehq-stable
+RUN apt-get update && \
+    aptitude install winehq-stable
 FROM node:10.13.0
 
 WORKDIR /usr/src/app
